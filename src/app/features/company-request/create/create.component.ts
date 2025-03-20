@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CompanyRequestService } from '../../../core/services/company-request.service';
+import { CepService } from '../../../core/services/cep.service';
 
 @Component({
   selector: 'app-create-request',
@@ -21,9 +22,9 @@ import { CompanyRequestService } from '../../../core/services/company-request.se
       <form [formGroup]="requestForm" (ngSubmit)="onSubmit()" class="bg-white rounded-lg shadow p-6">
         <div class="space-y-6">
           <!-- Dados do Solicitante -->
-          <div>
+          <div formGroupName="solicitante">
             <h2 class="text-lg font-semibold text-vox-blue-light mb-4">Dados do Solicitante</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label for="ds_responsavel" class="block text-sm font-medium text-gray-700">Nome</label>
                 <input type="text" id="ds_responsavel" formControlName="ds_responsavel"
@@ -32,8 +33,8 @@ import { CompanyRequestService } from '../../../core/services/company-request.se
                   disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none
                   invalid:border-pink-500 invalid:text-pink-600
                   focus:invalid:border-pink-500 focus:invalid:ring-pink-500">
-                <div *ngIf="isFieldInvalid('ds_responsavel')" class="text-red-500 text-xs mt-1">
-                  {{ getFieldError('ds_responsavel') }}
+                <div *ngIf="isFieldInvalid('solicitante.ds_responsavel')" class="text-red-500 text-xs mt-1">
+                  {{ getFieldError('solicitante.ds_responsavel') }}
                 </div>
               </div>
 
@@ -45,8 +46,8 @@ import { CompanyRequestService } from '../../../core/services/company-request.se
                   disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none
                   invalid:border-pink-500 invalid:text-pink-600
                   focus:invalid:border-pink-500 focus:invalid:ring-pink-500">
-                <div *ngIf="isFieldInvalid('nu_cpf')" class="text-red-500 text-xs mt-1">
-                  {{ getFieldError('nu_cpf') }}
+                <div *ngIf="isFieldInvalid('solicitante.nu_cpf')" class="text-red-500 text-xs mt-1">
+                  {{ getFieldError('solicitante.nu_cpf') }}
                 </div>
               </div>
 
@@ -58,18 +59,18 @@ import { CompanyRequestService } from '../../../core/services/company-request.se
                   disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none
                   invalid:border-pink-500 invalid:text-pink-600
                   focus:invalid:border-pink-500 focus:invalid:ring-pink-500">
-                <div *ngIf="isFieldInvalid('date_nascimento')" class="text-red-500 text-xs mt-1">
-                  {{ getFieldError('date_nascimento') }}
+                <div *ngIf="isFieldInvalid('solicitante.date_nascimento')" class="text-red-500 text-xs mt-1">
+                  {{ getFieldError('solicitante.date_nascimento') }}
                 </div>
               </div>
             </div>
           </div>
 
           <!-- Dados da Empresa -->
-          <div>
+          <div formGroupName="empresa">
             <h2 class="text-lg font-semibold text-vox-blue-light mb-4">Dados da Empresa</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div class="md:col-span-2">
+            <div class="grid grid-cols-1 gap-4">
+              <div>
                 <label for="ds_nome_fantasia" class="block text-sm font-medium text-gray-700">Nome Fantasia</label>
                 <input type="text" id="ds_nome_fantasia" formControlName="ds_nome_fantasia"
                   class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm shadow-sm placeholder-slate-400
@@ -77,99 +78,117 @@ import { CompanyRequestService } from '../../../core/services/company-request.se
                   disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none
                   invalid:border-pink-500 invalid:text-pink-600
                   focus:invalid:border-pink-500 focus:invalid:ring-pink-500">
-                <div *ngIf="isFieldInvalid('ds_nome_fantasia')" class="text-red-500 text-xs mt-1">
-                  {{ getFieldError('ds_nome_fantasia') }}
+                <div *ngIf="isFieldInvalid('empresa.ds_nome_fantasia')" class="text-red-500 text-xs mt-1">
+                  {{ getFieldError('empresa.ds_nome_fantasia') }}
                 </div>
               </div>
 
-              <div>
-                <label for="co_cep" class="block text-sm font-medium text-gray-700">CEP</label>
-                <input type="text" id="co_cep" formControlName="co_cep"
-                  class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm shadow-sm placeholder-slate-400
-                  focus:outline-none focus:border-vox-blue focus:ring-1 focus:ring-vox-blue
-                  disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none
-                  invalid:border-pink-500 invalid:text-pink-600
-                  focus:invalid:border-pink-500 focus:invalid:ring-pink-500">
-                <div *ngIf="isFieldInvalid('co_cep')" class="text-red-500 text-xs mt-1">
-                  {{ getFieldError('co_cep') }}
+              <div formGroupName="endereco" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="md:col-span-4">
+                  <label for="co_cep" class="block text-sm font-medium text-gray-700">CEP</label>
+                  <div class="flex gap-2">
+                    <input type="text" id="co_cep" formControlName="co_cep"
+                      (blur)="consultarCep()"
+                      class="mt-1 block w-64 px-3 py-2 bg-white border border-gray-300 rounded-md text-sm shadow-sm placeholder-slate-400
+                      focus:outline-none focus:border-vox-blue focus:ring-1 focus:ring-vox-blue
+                      disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none
+                      invalid:border-pink-500 invalid:text-pink-600
+                      focus:invalid:border-pink-500 focus:invalid:ring-pink-500">
+                    <button type="button" 
+                      [disabled]="isLoadingCep || !requestForm.get('empresa.endereco.co_cep')?.value?.length || requestForm.get('empresa.endereco.co_cep')?.invalid"
+                      (click)="consultarCep()"
+                      class="mt-1 px-4 py-2 bg-vox-blue-light text-white rounded-md hover:bg-vox-blue transition-colors duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center gap-2">
+                      <svg *ngIf="isLoadingCep" class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      {{ isLoadingCep ? 'Buscando...' : 'Buscar' }}
+                    </button>
+                  </div>
+                  <div *ngIf="isFieldInvalid('empresa.endereco.co_cep')" class="text-red-500 text-xs mt-1">
+                    {{ getFieldError('empresa.endereco.co_cep') }}
+                  </div>
+                  <div *ngIf="cepError" class="text-red-500 text-xs mt-1">
+                    {{ cepError }}
+                  </div>
                 </div>
-              </div>
 
-              <div class="md:col-span-2">
-                <label for="ds_logradouro" class="block text-sm font-medium text-gray-700">Logradouro</label>
-                <input type="text" id="ds_logradouro" formControlName="ds_logradouro"
-                  class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm shadow-sm placeholder-slate-400
-                  focus:outline-none focus:border-vox-blue focus:ring-1 focus:ring-vox-blue
-                  disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none
-                  invalid:border-pink-500 invalid:text-pink-600
-                  focus:invalid:border-pink-500 focus:invalid:ring-pink-500">
-                <div *ngIf="isFieldInvalid('ds_logradouro')" class="text-red-500 text-xs mt-1">
-                  {{ getFieldError('ds_logradouro') }}
+                <div class="md:col-span-2">
+                  <label for="ds_logradouro" class="block text-sm font-medium text-gray-700">Logradouro</label>
+                  <input type="text" id="ds_logradouro" formControlName="ds_logradouro"
+                    class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm shadow-sm placeholder-slate-400
+                    focus:outline-none focus:border-vox-blue focus:ring-1 focus:ring-vox-blue
+                    disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none
+                    invalid:border-pink-500 invalid:text-pink-600
+                    focus:invalid:border-pink-500 focus:invalid:ring-pink-500">
+                  <div *ngIf="isFieldInvalid('empresa.endereco.ds_logradouro')" class="text-red-500 text-xs mt-1">
+                    {{ getFieldError('empresa.endereco.ds_logradouro') }}
+                  </div>
                 </div>
-              </div>
 
-              <div>
-                <label for="co_numero" class="block text-sm font-medium text-gray-700">Número</label>
-                <input type="text" id="co_numero" formControlName="co_numero"
-                  class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm shadow-sm placeholder-slate-400
-                  focus:outline-none focus:border-vox-blue focus:ring-1 focus:ring-vox-blue
-                  disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none
-                  invalid:border-pink-500 invalid:text-pink-600
-                  focus:invalid:border-pink-500 focus:invalid:ring-pink-500">
-                <div *ngIf="isFieldInvalid('co_numero')" class="text-red-500 text-xs mt-1">
-                  {{ getFieldError('co_numero') }}
+                <div>
+                  <label for="co_numero" class="block text-sm font-medium text-gray-700">Número</label>
+                  <input type="text" id="co_numero" formControlName="co_numero"
+                    class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm shadow-sm placeholder-slate-400
+                    focus:outline-none focus:border-vox-blue focus:ring-1 focus:ring-vox-blue
+                    disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none
+                    invalid:border-pink-500 invalid:text-pink-600
+                    focus:invalid:border-pink-500 focus:invalid:ring-pink-500">
+                  <div *ngIf="isFieldInvalid('empresa.endereco.co_numero')" class="text-red-500 text-xs mt-1">
+                    {{ getFieldError('empresa.endereco.co_numero') }}
+                  </div>
                 </div>
-              </div>
 
-              <div>
-                <label for="ds_complemento" class="block text-sm font-medium text-gray-700">Complemento</label>
-                <input type="text" id="ds_complemento" formControlName="ds_complemento"
-                  class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm shadow-sm placeholder-slate-400
-                  focus:outline-none focus:border-vox-blue focus:ring-1 focus:ring-vox-blue
-                  disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none
-                  invalid:border-pink-500 invalid:text-pink-600
-                  focus:invalid:border-pink-500 focus:invalid:ring-pink-500">
-                <div *ngIf="isFieldInvalid('ds_complemento')" class="text-red-500 text-xs mt-1">
-                  {{ getFieldError('ds_complemento') }}
+                <div>
+                  <label for="ds_complemento" class="block text-sm font-medium text-gray-700">Complemento</label>
+                  <input type="text" id="ds_complemento" formControlName="ds_complemento"
+                    class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm shadow-sm placeholder-slate-400
+                    focus:outline-none focus:border-vox-blue focus:ring-1 focus:ring-vox-blue
+                    disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none
+                    invalid:border-pink-500 invalid:text-pink-600
+                    focus:invalid:border-pink-500 focus:invalid:ring-pink-500">
+                  <div *ngIf="isFieldInvalid('empresa.endereco.ds_complemento')" class="text-red-500 text-xs mt-1">
+                    {{ getFieldError('empresa.endereco.ds_complemento') }}
+                  </div>
                 </div>
-              </div>
 
-              <div>
-                <label for="ds_bairro" class="block text-sm font-medium text-gray-700">Bairro</label>
-                <input type="text" id="ds_bairro" formControlName="ds_bairro"
-                  class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm shadow-sm placeholder-slate-400
-                  focus:outline-none focus:border-vox-blue focus:ring-1 focus:ring-vox-blue
-                  disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none
-                  invalid:border-pink-500 invalid:text-pink-600
-                  focus:invalid:border-pink-500 focus:invalid:ring-pink-500">
-                <div *ngIf="isFieldInvalid('ds_bairro')" class="text-red-500 text-xs mt-1">
-                  {{ getFieldError('ds_bairro') }}
+                <div>
+                  <label for="ds_bairro" class="block text-sm font-medium text-gray-700">Bairro</label>
+                  <input type="text" id="ds_bairro" formControlName="ds_bairro"
+                    class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm shadow-sm placeholder-slate-400
+                    focus:outline-none focus:border-vox-blue focus:ring-1 focus:ring-vox-blue
+                    disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none
+                    invalid:border-pink-500 invalid:text-pink-600
+                    focus:invalid:border-pink-500 focus:invalid:ring-pink-500">
+                  <div *ngIf="isFieldInvalid('empresa.endereco.ds_bairro')" class="text-red-500 text-xs mt-1">
+                    {{ getFieldError('empresa.endereco.ds_bairro') }}
+                  </div>
                 </div>
-              </div>
 
-              <div>
-                <label for="ds_municipio" class="block text-sm font-medium text-gray-700">Município</label>
-                <input type="text" id="ds_municipio" formControlName="ds_municipio"
-                  class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm shadow-sm placeholder-slate-400
-                  focus:outline-none focus:border-vox-blue focus:ring-1 focus:ring-vox-blue
-                  disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none
-                  invalid:border-pink-500 invalid:text-pink-600
-                  focus:invalid:border-pink-500 focus:invalid:ring-pink-500">
-                <div *ngIf="isFieldInvalid('ds_municipio')" class="text-red-500 text-xs mt-1">
-                  {{ getFieldError('ds_municipio') }}
+                <div>
+                  <label for="ds_municipio" class="block text-sm font-medium text-gray-700">Município</label>
+                  <input type="text" id="ds_municipio" formControlName="ds_municipio"
+                    class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm shadow-sm placeholder-slate-400
+                    focus:outline-none focus:border-vox-blue focus:ring-1 focus:ring-vox-blue
+                    disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none
+                    invalid:border-pink-500 invalid:text-pink-600
+                    focus:invalid:border-pink-500 focus:invalid:ring-pink-500">
+                  <div *ngIf="isFieldInvalid('empresa.endereco.ds_municipio')" class="text-red-500 text-xs mt-1">
+                    {{ getFieldError('empresa.endereco.ds_municipio') }}
+                  </div>
                 </div>
-              </div>
 
-              <div>
-                <label for="ds_uf" class="block text-sm font-medium text-gray-700">UF</label>
-                <input type="text" id="ds_uf" formControlName="ds_uf"
-                  class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm shadow-sm placeholder-slate-400
-                  focus:outline-none focus:border-vox-blue focus:ring-1 focus:ring-vox-blue
-                  disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none
-                  invalid:border-pink-500 invalid:text-pink-600
-                  focus:invalid:border-pink-500 focus:invalid:ring-pink-500">
-                <div *ngIf="isFieldInvalid('ds_uf')" class="text-red-500 text-xs mt-1">
-                  {{ getFieldError('ds_uf') }}
+                <div>
+                  <label for="ds_uf" class="block text-sm font-medium text-gray-700">UF</label>
+                  <input type="text" id="ds_uf" formControlName="ds_uf"
+                    class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm shadow-sm placeholder-slate-400
+                    focus:outline-none focus:border-vox-blue focus:ring-1 focus:ring-vox-blue
+                    disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none
+                    invalid:border-pink-500 invalid:text-pink-600
+                    focus:invalid:border-pink-500 focus:invalid:ring-pink-500">
+                  <div *ngIf="isFieldInvalid('empresa.endereco.ds_uf')" class="text-red-500 text-xs mt-1">
+                    {{ getFieldError('empresa.endereco.ds_uf') }}
+                  </div>
                 </div>
               </div>
             </div>
@@ -213,16 +232,19 @@ import { CompanyRequestService } from '../../../core/services/company-request.se
         </div>
       </div>
     </div>
-  `
+  `,
 })
 export class CreateRequestComponent {
   requestForm: FormGroup;
   showSuccessModal = false;
+  cepError: string = '';
+  isLoadingCep = false;
 
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private companyRequestService: CompanyRequestService
+    private companyRequestService: CompanyRequestService,
+    private cepService: CepService
   ) {
     this.requestForm = this.fb.group({
       solicitante: this.fb.group({
@@ -259,6 +281,37 @@ export class CreateRequestComponent {
       if (field.errors['minlength'] || field.errors['maxlength']) return 'Tamanho inválido';
     }
     return '';
+  }
+
+  consultarCep() {
+    const cep = this.requestForm.get('empresa.endereco.co_cep')?.value;
+    if (!cep) return;
+
+    this.cepError = '';
+    this.isLoadingCep = true;
+    
+    this.cepService.consultarCep(cep).subscribe({
+      next: (response) => {
+        setTimeout(() => {
+          const enderecoGroup = this.requestForm.get('empresa.endereco');
+          if (enderecoGroup) {
+            enderecoGroup.patchValue({
+              ds_logradouro: response.logradouro,
+              ds_bairro: response.bairro,
+              ds_municipio: response.localidade,
+              ds_uf: response.uf
+            });
+          }
+          this.isLoadingCep = false;
+        }, 2000);
+      },
+      error: (error) => {
+        setTimeout(() => {
+          this.cepError = error.message;
+          this.isLoadingCep = false;
+        }, 2000);
+      }
+    });
   }
 
   onSubmit() {

@@ -13,7 +13,7 @@ export class CompanyRequestService {
   constructor(private mockDataService: MockDataService) {
     this.companyRequests = this.mockDataService.getCompanyRequests();
     this.totalRequests = computed(() => this.companyRequests().length);
-    this.activeRequests = computed(() => this.companyRequests().filter(req => req.empresa.ds_nome_fantasia.includes('Tech')).length);
+    this.activeRequests = computed(() => this.companyRequests().length);
   }
 
   getCompanyRequests() {
