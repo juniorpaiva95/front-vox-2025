@@ -4,11 +4,13 @@ import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CompanyRequestService } from '../../../core/services/company-request.service';
 import { CepService } from '../../../core/services/cep.service';
+import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
 
 @Component({
   selector: 'app-create-request',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, NgxMaskDirective],
+  providers: [provideNgxMask()],
   template: `
     <div class="container mx-auto px-4 py-8">
       <div class="flex justify-between items-center mb-8">
@@ -41,6 +43,8 @@ import { CepService } from '../../../core/services/cep.service';
               <div>
                 <label for="nu_cpf" class="block text-sm font-medium text-gray-700">CPF</label>
                 <input type="text" id="nu_cpf" formControlName="nu_cpf"
+                  mask="000.000.000-00"
+                  placeholder="000.000.000-00"
                   class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm shadow-sm placeholder-slate-400
                   focus:outline-none focus:border-vox-blue focus:ring-1 focus:ring-vox-blue
                   disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none
@@ -89,6 +93,8 @@ import { CepService } from '../../../core/services/cep.service';
                   <div class="flex gap-2">
                     <input type="text" id="co_cep" formControlName="co_cep"
                       (blur)="consultarCep()"
+                      mask="00000-000"
+                      placeholder="00000-000"
                       class="mt-1 block w-64 px-3 py-2 bg-white border border-gray-300 rounded-md text-sm shadow-sm placeholder-slate-400
                       focus:outline-none focus:border-vox-blue focus:ring-1 focus:ring-vox-blue
                       disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none
@@ -255,7 +261,7 @@ export class CreateRequestComponent {
       empresa: this.fb.group({
         ds_nome_fantasia: ['', [Validators.required, Validators.minLength(3)]],
         endereco: this.fb.group({
-          co_cep: ['', [Validators.required, Validators.pattern(/^\d{8}$/)]],
+          co_cep: ['', [Validators.required, Validators.pattern(/^\d{5}-?\d{3}$/)]],
           ds_logradouro: ['', [Validators.required]],
           co_numero: ['', [Validators.required]],
           ds_complemento: [''],
@@ -284,7 +290,7 @@ export class CreateRequestComponent {
   }
 
   consultarCep() {
-    const cep = this.requestForm.get('empresa.endereco.co_cep')?.value;
+    const cep = this.requestForm.get('empresa.endereco.co_cep')?.value?.replace('-', '');
     if (!cep) return;
 
     this.cepError = '';
