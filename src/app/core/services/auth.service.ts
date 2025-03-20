@@ -1,11 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
-
-export interface LoginCredentials {
-  email: string;
-  password: string;
-}
+import { LoginCredentials } from '../models/login-credentials.model';
 
 @Injectable({
   providedIn: 'root'
