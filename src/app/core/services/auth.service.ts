@@ -1,50 +1,43 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
-import { environment } from '../../../environments/environment';
-import { StateService } from './state.service';
+import { Observable, of } from 'rxjs';
+import { tap } from 'rxjs/operators';
 
 export interface LoginCredentials {
   email: string;
   password: string;
 }
 
-export interface AuthResponse {
-  token: string;
-  user: any;
-}
-
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly TOKEN_KEY = 'auth_token';
+  private readonly MOCK_USER = {
+    email: 'admin',
+    password: 'admin'
+  };
 
-  constructor(
-    private http: HttpClient,
-    private stateService: StateService
-  ) {}
+  constructor() {}
 
-  login(credentials: LoginCredentials): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${environment.apiUrl}/auth/login`, credentials)
-      .pipe(
-        tap(response => {
-          localStorage.setItem(this.TOKEN_KEY, response.token);
-          this.stateService.set('user', response.user);
-        })
-      );
+  login(credentials: LoginCredentials): Observable<any> {
+    return of({
+      success: credentials.email === this.MOCK_USER.email && credentials.password === this.MOCK_USER.password,
+      user: credentials.email === this.MOCK_USER.email ? { email: credentials.email } : null
+    }).pipe(
+      tap(response => {
+        if (response.success) {
+          localStorage.setItem('isLoggedIn', 'true');
+          localStorage.setItem('user', JSON.stringify(response.user));
+        }
+      })
+    );
   }
 
   logout(): void {
-    localStorage.removeItem(this.TOKEN_KEY);
-    this.stateService.reset();
+    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('user');
   }
 
-  isAuthenticated(): boolean {
-    return !!localStorage.getItem(this.TOKEN_KEY);
-  }
-
-  getToken(): string | null {
-    return localStorage.getItem(this.TOKEN_KEY);
+  isLoggedIn(): boolean {
+    return localStorage.getItem('isLoggedIn') === 'true';
   }
 } 

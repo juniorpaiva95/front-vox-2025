@@ -1,21 +1,14 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { HeaderComponent } from './core/components/header/header.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, HeaderComponent],
   template: `
-    <div class="min-h-screen bg-gray-100">
-      <nav class="bg-white shadow-sm">
-        <div class="container mx-auto px-4 py-3">
-          <img src="assets/images/logo.svg" alt="Vox Logo" class="h-8">
-        </div>
-      </nav>
-      <main>
-        <router-outlet></router-outlet>
-      </main>
-    </div>
+    <app-header></app-header>
+    <router-outlet></router-outlet>
   `
 })
 export class AppComponent {

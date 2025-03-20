@@ -1,0 +1,13 @@
+{
+  "editor.quickSuggestions": {
+    "strings": true
+  },
+  "tailwindCSS.includeLanguages": {
+    "html": "html",
+    "typescript": "typescript"
+  },
+  "tailwindCSS.experimental.classRegex": [],
+  "tailwindCSS.validate": true,
+  "css.validate": false,
+  "editor.inlineSuggestions": true
+} 
