@@ -24,7 +24,8 @@ export class MockDataService {
           "ds_municipio": "São Paulo",
           "ds_uf": "SP"
         }
-      }
+      },
+      "status": "active"
     },
     {
       "id": "2",
@@ -44,7 +45,8 @@ export class MockDataService {
           "ds_municipio": "Rio de Janeiro",
           "ds_uf": "RJ"
         }
-      }
+      },
+      "status": "pending"
     }
   ]);
 

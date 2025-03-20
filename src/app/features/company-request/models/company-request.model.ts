@@ -17,4 +17,5 @@ export interface CompanyRequest {
       ds_uf: string;
     };
   };
+  status: 'active' | 'inactive' | 'pending';
 } 

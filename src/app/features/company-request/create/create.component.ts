@@ -5,11 +5,12 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { CompanyRequestService } from '../../../core/services/company-request.service';
 import { CepService } from '../../../core/services/cep.service';
 import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
+import { ModalComponent } from '../../../core/components/modal/modal.component';
 
 @Component({
   selector: 'app-create-request',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, NgxMaskDirective],
+  imports: [CommonModule, ReactiveFormsModule, NgxMaskDirective, ModalComponent],
   providers: [provideNgxMask()],
   template: `
     <div class="container mx-auto px-4 py-8">
@@ -215,29 +216,18 @@ import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
     </div>
 
     <!-- Modal de Sucesso -->
-    <div *ngIf="showSuccessModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
-      <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-        <div class="mt-3 text-center">
-          <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
-            <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-            </svg>
-          </div>
-          <h3 class="text-lg leading-6 font-medium text-gray-900 mt-4">Sucesso!</h3>
-          <div class="mt-2 px-7 py-3">
-            <p class="text-sm text-gray-500">
-              Solicitação cadastrada com sucesso
-            </p>
-          </div>
-          <div class="items-center px-4 py-3">
-            <button (click)="closeModal()"
-              class="px-4 py-2 bg-vox-blue-light text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-vox-blue focus:outline-none focus:ring-2 focus:ring-vox-blue-light">
-              OK
-            </button>
-          </div>
-        </div>
+    <app-modal
+      [isOpen]="showSuccessModal"
+      title="Sucesso!"
+      buttonText="OK"
+      (close)="closeModal()">
+      <div icon>
+        <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+        </svg>
       </div>
-    </div>
+      Solicitação cadastrada com sucesso
+    </app-modal>
   `,
 })
 export class CreateRequestComponent {
