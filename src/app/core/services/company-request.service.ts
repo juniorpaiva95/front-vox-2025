@@ -1,34 +1,38 @@
-import { Injectable, computed } from '@angular/core';
-import { CompanyRequest } from '../../features/company-request/models/company-request.model';
+import { Injectable, computed, signal } from '@angular/core';
 import { MockDataService } from './mock-data.service';
+import { companyRequests, addCompanyRequest, updateCompanyRequest, deleteCompanyRequest } from '../../features/company-request/state/company-request.state';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CompanyRequestService {
-  private companyRequests;
-  readonly totalRequests;
-  readonly activeRequests;
+  readonly totalRequests = computed(() => companyRequests().length);
+  readonly activeRequests = computed(() => companyRequests().filter(request => request.status === 'active').length);
+  readonly pendingRequests = computed(() => companyRequests().filter(request => request.status === 'pending').length);
 
   constructor(private mockDataService: MockDataService) {
-    this.companyRequests = this.mockDataService.getCompanyRequests();
-    this.totalRequests = computed(() => this.companyRequests().length);
-    this.activeRequests = computed(() => this.companyRequests().length);
+    // Inicializa o estado com os dados do mock
+    const initialRequests = this.mockDataService.getCompanyRequests();
+    initialRequests.forEach(request => addCompanyRequest(request));
   }
 
   getCompanyRequests() {
-    return this.companyRequests;
+    return companyRequests();
   }
 
-  addCompanyRequest(request: CompanyRequest) {
-    this.mockDataService.addCompanyRequest(request);
+  getCompanyRequest(id: string) {
+    return companyRequests().find(request => request.id === id);
   }
 
-  updateCompanyRequest(id: string, request: CompanyRequest) {
-    this.mockDataService.updateCompanyRequest(id, request);
+  addCompanyRequest(request: any) {
+    addCompanyRequest(request);
+  }
+
+  updateCompanyRequest(id: string, request: any) {
+    updateCompanyRequest(id, request);
   }
 
   deleteCompanyRequest(id: string) {
-    this.mockDataService.deleteCompanyRequest(id);
+    deleteCompanyRequest(id);
   }
 } 

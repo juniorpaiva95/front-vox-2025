@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, map } from 'rxjs';
+import { Observable, map, delay } from 'rxjs';
 
 export interface CepResponse {
   cep: string;
@@ -32,6 +32,7 @@ export class CepService {
     }
 
     return this.http.get<CepResponse>(`${this.baseUrl}/${cepLimpo}/json`).pipe(
+      delay(1000),
       map(response => {
         if (response.erro) {
           throw new Error('CEP não encontrado');

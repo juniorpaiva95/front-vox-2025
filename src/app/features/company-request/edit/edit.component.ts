@@ -1,32 +1,32 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { CompanyRequestService } from '../../../core/services/company-request.service';
-import { CepService } from '../../../core/services/cep.service';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
-import { ModalComponent } from '../../../core/components/modal/modal.component';
+import { CepService } from '../../../core/services/cep.service';
 import { MockDataService } from '../../../core/services/mock-data.service';
-import { addCompanyRequest } from '../state/company-request.state';
+import { ModalComponent } from '../../../core/components/modal/modal.component';
+import { companyRequests, updateCompanyRequest } from '../state/company-request.state';
 
 @Component({
-  selector: 'app-create-request',
+  selector: 'app-edit-request',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, NgxMaskDirective, ModalComponent],
   providers: [provideNgxMask()],
-  templateUrl: './create.component.html',
-  styleUrls: ['./create.component.scss']
+  templateUrl: './edit.component.html',
+  styleUrls: ['./edit.component.scss']
 })
-export class CreateRequestComponent implements OnInit {
+export class EditRequestComponent implements OnInit {
   requestForm: FormGroup;
   showSuccessModal = false;
-  cepError: string = '';
+  requestId!: string;
   isLoadingCep = false;
+  cepError: string = '';
 
   constructor(
     private fb: FormBuilder,
+    private route: ActivatedRoute,
     public router: Router,
-    private companyRequestService: CompanyRequestService,
     private cepService: CepService,
     private mockDataService: MockDataService
   ) {
@@ -34,7 +34,7 @@ export class CreateRequestComponent implements OnInit {
       solicitante: this.fb.group({
         ds_responsavel: ['', [Validators.required, Validators.minLength(3)]],
         nu_cpf: ['', [Validators.required, Validators.pattern(/^\d{3}\.?\d{3}\.?\d{3}-?\d{2}$/)]],
-        date_nascimento: ['', [Validators.required]]
+        date_nascimento: ['', Validators.required]
       }),
       empresa: this.fb.group({
         ds_nome_fantasia: ['', [Validators.required, Validators.minLength(3)]],
@@ -51,22 +51,34 @@ export class CreateRequestComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {}
-
-  isFieldInvalid(fieldPath: string): boolean {
-    const field = this.requestForm.get(fieldPath);
-    return field ? field.invalid && (field.dirty || field.touched) : false;
-  }
-
-  getFieldError(fieldPath: string): string {
-    const field = this.requestForm.get(fieldPath);
-    if (field?.errors) {
-      if (field.errors['required']) return 'Este campo é obrigatório';
-      if (field.errors['minlength']) return `Mínimo de ${field.errors['minlength'].requiredLength} caracteres`;
-      if (field.errors['pattern']) return 'Formato inválido';
-      if (field.errors['minlength'] || field.errors['maxlength']) return 'Tamanho inválido';
+  ngOnInit(): void {
+    this.requestId = this.route.snapshot.paramMap.get('id') || '';
+    const request = companyRequests().find(r => r.id === this.requestId);
+    
+    if (!request) {
+      this.router.navigate(['/dashboard']);
+      return;
     }
-    return '';
+
+    this.requestForm.patchValue({
+      solicitante: {
+        ds_responsavel: request.solicitante.ds_responsavel,
+        nu_cpf: request.solicitante.nu_cpf,
+        date_nascimento: request.solicitante.date_nascimento
+      },
+      empresa: {
+        ds_nome_fantasia: request.empresa.ds_nome_fantasia,
+        endereco: {
+          co_cep: request.empresa.endereco.co_cep,
+          ds_logradouro: request.empresa.endereco.ds_logradouro,
+          co_numero: request.empresa.endereco.co_numero,
+          ds_complemento: request.empresa.endereco.ds_complemento,
+          ds_bairro: request.empresa.endereco.ds_bairro,
+          ds_municipio: request.empresa.endereco.ds_municipio,
+          ds_uf: request.empresa.endereco.ds_uf
+        }
+      }
+    });
   }
 
   consultarCep(): void {
@@ -108,60 +120,50 @@ export class CreateRequestComponent implements OnInit {
 
   onSubmit(): void {
     if (this.requestForm.valid) {
-      const request = {
-        id: Date.now().toString(),
+      const updatedRequest = {
         ...this.requestForm.value,
-        status: 'pending'
+        id: this.requestId,
+        status: 'PENDENTE'
       };
 
-      this.mockDataService.addCompanyRequest(request);
-      addCompanyRequest(request);
+      updateCompanyRequest(this.requestId, updatedRequest);
       this.showSuccessModal = true;
     } else {
-      Object.keys(this.requestForm.controls).forEach(key => {
-        const control = this.requestForm.get(key);
-        if (control instanceof FormGroup) {
-          Object.keys(control.controls).forEach(subKey => {
-            const subControl = control.get(subKey);
-            if (subControl instanceof FormGroup) {
-              Object.keys(subControl.controls).forEach(nestedKey => {
-                subControl.get(nestedKey)?.markAsTouched();
-              });
-            } else {
-              subControl?.markAsTouched();
-            }
-          });
-        } else {
-          control?.markAsTouched();
-        }
-      });
+      this.markFormGroupTouched(this.requestForm);
     }
+  }
+
+  markFormGroupTouched(formGroup: FormGroup): void {
+    Object.values(formGroup.controls).forEach(control => {
+      control.markAsTouched();
+      if (control instanceof FormGroup) {
+        this.markFormGroupTouched(control);
+      }
+    });
+  }
+
+  getErrorMessage(path: string): string {
+    const control = this.requestForm.get(path);
+    if (control?.hasError('required')) {
+      return 'Este campo é obrigatório';
+    }
+    if (control?.hasError('minlength')) {
+      return `Mínimo de ${control.errors?.['minlength'].requiredLength} caracteres`;
+    }
+    if (control?.hasError('pattern')) {
+      if (path.includes('nu_cpf')) {
+        return 'CPF inválido';
+      }
+      if (path.includes('co_cep')) {
+        return 'CEP inválido';
+      }
+      return 'Formato inválido';
+    }
+    return '';
   }
 
   closeModal(): void {
     this.showSuccessModal = false;
     this.router.navigate(['/dashboard']);
-  }
-
-  getErrorMessage(controlPath: string): string {
-    const control = this.requestForm.get(controlPath);
-    if (control?.hasError('required')) {
-      return 'Este campo é obrigatório';
-    }
-    if (control?.hasError('pattern')) {
-      if (controlPath.includes('nu_cpf')) {
-        return 'CPF inválido';
-      }
-      if (controlPath.includes('co_cep')) {
-        return 'CEP inválido';
-      }
-    }
-    if (control?.hasError('minlength') || control?.hasError('maxlength')) {
-      return 'UF deve ter 2 caracteres';
-    }
-    if (control?.hasError('cepInvalido')) {
-      return 'CEP não encontrado';
-    }
-    return '';
   }
 } 

@@ -1,0 +1,114 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="flex justify-between items-center mb-8">
+    <h1 class="text-2xl font-bold text-vox-blue-light">Visualizar Solicitação</h1>
+    <div class="flex gap-4">
+      <button (click)="router.navigate(['/dashboard'])" 
+        class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors duration-200">
+        Voltar
+      </button>
+      <button (click)="deleteRequest()" 
+        class="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors duration-200">
+        Excluir
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="request" class="bg-white rounded-lg shadow p-6">
+    <div class="space-y-6">
+      <!-- Status -->
+      <div class="flex items-center gap-4">
+        <span class="text-sm font-medium text-gray-700">Status:</span>
+        <app-badge 
+          [text]="getStatusText(request.status)"
+          [variant]="getStatusVariant(request.status)">
+        </app-badge>
+      </div>
+
+      <!-- Dados do Solicitante -->
+      <div>
+        <h2 class="text-lg font-semibold text-vox-blue-light mb-4">Dados do Solicitante</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Nome</label>
+            <p class="mt-1 text-sm text-gray-900">{{ request.solicitante.ds_responsavel }}</p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">CPF</label>
+            <p class="mt-1 text-sm text-gray-900">{{ request.solicitante.nu_cpf }}</p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Data de Nascimento</label>
+            <p class="mt-1 text-sm text-gray-900">{{ request.solicitante.date_nascimento | date:'dd/MM/yyyy' }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dados da Empresa -->
+      <div>
+        <h2 class="text-lg font-semibold text-vox-blue-light mb-4">Dados da Empresa</h2>
+        <div class="grid grid-cols-1 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Nome Fantasia</label>
+            <p class="mt-1 text-sm text-gray-900">{{ request.empresa.ds_nome_fantasia }}</p>
+          </div>
+
+          <div>
+            <h3 class="text-md font-medium text-gray-700 mb-2">Endereço</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700">CEP</label>
+                <p class="mt-1 text-sm text-gray-900">{{ request.empresa.endereco.co_cep }}</p>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Logradouro</label>
+                <p class="mt-1 text-sm text-gray-900">{{ request.empresa.endereco.ds_logradouro }}</p>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Número</label>
+                <p class="mt-1 text-sm text-gray-900">{{ request.empresa.endereco.co_numero }}</p>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Complemento</label>
+                <p class="mt-1 text-sm text-gray-900">{{ request.empresa.endereco.ds_complemento || '-' }}</p>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Bairro</label>
+                <p class="mt-1 text-sm text-gray-900">{{ request.empresa.endereco.ds_bairro }}</p>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Município</label>
+                <p class="mt-1 text-sm text-gray-900">{{ request.empresa.endereco.ds_municipio }}</p>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700">UF</label>
+                <p class="mt-1 text-sm text-gray-900">{{ request.empresa.endereco.ds_uf }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!request" class="text-center py-8">
+    <p class="text-vox-gray">Solicitação não encontrada</p>
+  </div>
+</div>
+
+<!-- Modal de Confirmação de Exclusão -->
+<app-modal
+  [isOpen]="showDeleteModal"
+  title="Confirmar Exclusão"
+  type="danger"
+  confirmButtonText="Excluir"
+  cancelButtonText="Cancelar"
+  [showCancelButton]="true"
+  (confirm)="confirmDelete()"
+  (cancel)="cancelDelete()">
+  <div icon>
+    <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+    </svg>
+  </div>
+  Tem certeza que deseja excluir esta solicitação? Esta ação não poderá ser desfeita.
+</app-modal> 

@@ -1,0 +1,34 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  background-color: #f3f4f6;
+}
+
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.text-vox-blue-light {
+  color: #2563eb;
+}
+
+.text-vox-blue {
+  color: #1d4ed8;
+}
+
+.text-vox-gray {
+  color: #6b7280;
+}
+
+.bg-vox-blue-light {
+  background-color: #2563eb;
+}
+
+.bg-vox-blue {
+  background-color: #1d4ed8;
+}
+
+.hover\:bg-vox-blue:hover {
+  background-color: #1d4ed8;
+} 
