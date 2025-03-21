@@ -68,15 +68,7 @@
               ></app-badge>
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-              <button (click)="viewRequest(request.id)" class="text-vox-blue-light hover:text-vox-blue mr-3">
-                Visualizar
-              </button>
-              <button (click)="editRequest(request.id)" class="text-yellow-600 hover:text-yellow-800 mr-3">
-                Editar
-              </button>
-              <button (click)="deleteRequest(request.id)" class="text-red-600 hover:text-red-800">
-                Excluir
-              </button>
+              <app-dropdown [items]="getDropdownItems(request)"></app-dropdown>
             </td>
           </tr>
         </tbody>
