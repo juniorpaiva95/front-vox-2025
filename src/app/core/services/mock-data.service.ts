@@ -1,33 +1,33 @@
 import { Injectable } from '@angular/core';
 import { CompanyRequest } from '../../features/company-request/models/company-request.model';
-import { updateCompanyRequests } from '../../features/company-request/state/company-request.state';
-import mockData from '../../../mocks/db.json';
+import { StateService } from '../../state/state.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MockDataService {
-  private mockData: CompanyRequest[] = mockData.empresas;
+  constructor(private stateService: StateService) {}
 
   getCompanyRequests(): CompanyRequest[] {
-    return this.mockData;
+    return this.stateService.getState().empresas;
   }
 
   addCompanyRequest(request: CompanyRequest): void {
-    this.mockData.push(request);
-    updateCompanyRequests(this.mockData);
+    const currentEmpresas = this.stateService.getState().empresas;
+    this.stateService.set('empresas', [...currentEmpresas, request]);
   }
 
   updateCompanyRequest(id: string, request: CompanyRequest): void {
-    const index = this.mockData.findIndex(r => r.id === id);
-    if (index !== -1) {
-      this.mockData[index] = request;
-      updateCompanyRequests(this.mockData);
-    }
+    const currentEmpresas = this.stateService.getState().empresas;
+    const updatedEmpresas = currentEmpresas.map(e => 
+      e.id === id ? request : e
+    );
+    this.stateService.set('empresas', updatedEmpresas);
   }
 
   deleteCompanyRequest(id: string): void {
-    this.mockData = this.mockData.filter(r => r.id !== id);
-    updateCompanyRequests(this.mockData);
+    const currentEmpresas = this.stateService.getState().empresas;
+    const filteredEmpresas = currentEmpresas.filter(e => e.id !== id);
+    this.stateService.set('empresas', filteredEmpresas);
   }
 } 

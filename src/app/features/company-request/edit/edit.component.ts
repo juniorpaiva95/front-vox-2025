@@ -120,10 +120,13 @@ export class EditRequestComponent implements OnInit {
 
   onSubmit(): void {
     if (this.requestForm.valid) {
+      const request = companyRequests().find(r => r.id === this.requestId);
+      if (!request) return;
+
       const updatedRequest = {
         ...this.requestForm.value,
         id: this.requestId,
-        status: 'PENDENTE'
+        status: request.status // Mantém o status original
       };
 
       updateCompanyRequest(this.requestId, updatedRequest);

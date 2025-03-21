@@ -7,7 +7,7 @@ import { CompanyRequest } from '../company-request/models/company-request.model'
 import { MockDataService } from '../../core/services/mock-data.service';
 import { BadgeComponent, BadgeVariant } from '../../core/components/badge/badge.component';
 import { ModalComponent } from '../../core/components/modal/modal.component';
-import { companyRequests, totalRequests, activeRequests, pendingRequests } from '../company-request/state/company-request.state';
+import { companyRequests, totalRequests, activeRequests, pendingRequests, inactiveRequests } from '../company-request/state/company-request.state';
 
 @Component({
   selector: 'app-dashboard',
@@ -25,7 +25,7 @@ export class DashboardComponent implements OnInit {
   protected readonly total = totalRequests;
   protected readonly active = activeRequests;
   protected readonly pending = pendingRequests;
-
+  protected readonly inactive = inactiveRequests;
   constructor(
     private authService: AuthService,
     private router: Router,
