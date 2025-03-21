@@ -6,6 +6,10 @@
         class="px-4 py-2 bg-vox-blue-light text-white rounded-md hover:bg-vox-blue transition-colors duration-200">
         Nova Solicitação
       </button>
+      <button (click)="logout()"
+        class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors duration-200">
+        Sair
+      </button>
     </div>
   </div>
 
@@ -56,8 +60,8 @@
             <td class="px-6 py-4 whitespace-nowrap">
               <app-badge 
                 [text]="getStatusText(request.status)"
-                [variant]="getStatusVariant(request.status)">
-              </app-badge>
+                [variant]="getStatusVariant(request.status)"
+              ></app-badge>
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
               <button (click)="viewRequest(request.id)" class="text-vox-blue-light hover:text-vox-blue mr-3">

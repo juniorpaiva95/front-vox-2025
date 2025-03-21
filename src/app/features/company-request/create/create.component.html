@@ -93,7 +93,7 @@
                 <button type="button" 
                   [disabled]="isLoadingCep"
                   (click)="consultarCep()"
-                  class="mt-1 px-4 py-2 bg-vox-blue-light text-white rounded-md hover:bg-vox-blue transition-colors duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center gap-2">
+                  [class]="'mt-1 px-4 py-2 text-white rounded-md transition-colors duration-200 flex items-center gap-2 ' + (isLoadingCep ? 'bg-gray-400 cursor-not-allowed' : 'bg-vox-blue-light hover:bg-vox-blue')">
                   <span *ngIf="!isLoadingCep">Buscar</span>
                   <svg *ngIf="isLoadingCep" class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>

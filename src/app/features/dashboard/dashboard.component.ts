@@ -44,6 +44,8 @@ export class DashboardComponent implements OnInit {
         return 'Ativo';
       case 'pending':
         return 'Pendente';
+      case 'inactive':
+        return 'Inativo';
       default:
         return 'Desconhecido';
     }
@@ -55,6 +57,8 @@ export class DashboardComponent implements OnInit {
         return 'success';
       case 'pending':
         return 'warning';
+      case 'inactive':
+        return 'danger';
       default:
         return 'info';
     }

@@ -83,7 +83,7 @@ export class EditRequestComponent implements OnInit {
 
   consultarCep(): void {
     const cepControl = this.requestForm.get('empresa.endereco.co_cep');
-    const cep = cepControl?.value?.replace('-', '');
+    const cep = String(cepControl?.value).replace('-', '');
     
     if (!cep || cep.length !== 8) {
       this.cepError = 'CEP inválido';

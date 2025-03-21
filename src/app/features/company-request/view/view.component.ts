@@ -50,6 +50,8 @@ export class ViewRequestComponent implements OnInit {
         return 'Ativo';
       case 'pending':
         return 'Pendente';
+      case 'inactive':
+        return 'Inativo';
       default:
         return 'Desconhecido';
     }

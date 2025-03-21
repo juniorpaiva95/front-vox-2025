@@ -1,3 +1,5 @@
+type Status = 'active' | 'inactive' | 'pending' | string;
+
 export interface CompanyRequest {
   id: string;
   solicitante: {
@@ -8,14 +10,14 @@ export interface CompanyRequest {
   empresa: {
     ds_nome_fantasia: string;
     endereco: {
-      co_cep: string;
+      co_cep: string | number;
       ds_logradouro: string;
       co_numero: string;
-      ds_complemento?: string;
+      ds_complemento?: string | null;
       ds_bairro: string;
       ds_municipio: string;
       ds_uf: string;
     };
   };
-  status: 'active' | 'inactive' | 'pending';
+  status: Status;
 } 
