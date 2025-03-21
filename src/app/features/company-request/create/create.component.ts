@@ -2,12 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { CompanyRequestService } from '../../../core/services/company-request.service';
+import { CompanyRequestService } from '../services/company-request.service';
 import { CepService } from '../../../core/services/cep.service';
 import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
 import { ModalComponent } from '../../../core/components/modal/modal.component';
-import { MockDataService } from '../../../core/services/mock-data.service';
-import { addCompanyRequest } from '../state/company-request.state';
+import { v4 as uuidv4 } from 'uuid';
 
 @Component({
   selector: 'app-create-request',
@@ -27,8 +26,7 @@ export class CreateRequestComponent implements OnInit {
     private fb: FormBuilder,
     public router: Router,
     private companyRequestService: CompanyRequestService,
-    private cepService: CepService,
-    private mockDataService: MockDataService
+    private cepService: CepService
   ) {
     this.requestForm = this.fb.group({
       solicitante: this.fb.group({
@@ -109,59 +107,52 @@ export class CreateRequestComponent implements OnInit {
   onSubmit(): void {
     if (this.requestForm.valid) {
       const request = {
-        id: Date.now().toString(),
         ...this.requestForm.value,
+        id: uuidv4(),
         status: 'pending'
       };
 
-      this.mockDataService.addCompanyRequest(request);
-      addCompanyRequest(request);
-      this.showSuccessModal = true;
-    } else {
-      Object.keys(this.requestForm.controls).forEach(key => {
-        const control = this.requestForm.get(key);
-        if (control instanceof FormGroup) {
-          Object.keys(control.controls).forEach(subKey => {
-            const subControl = control.get(subKey);
-            if (subControl instanceof FormGroup) {
-              Object.keys(subControl.controls).forEach(nestedKey => {
-                subControl.get(nestedKey)?.markAsTouched();
-              });
-            } else {
-              subControl?.markAsTouched();
-            }
-          });
-        } else {
-          control?.markAsTouched();
+      this.companyRequestService.addCompanyRequest(request).subscribe({
+        next: () => {
+          this.showSuccessModal = true;
         }
       });
+    } else {
+      this.markFormGroupTouched(this.requestForm);
     }
+  }
+
+  markFormGroupTouched(formGroup: FormGroup): void {
+    Object.values(formGroup.controls).forEach(control => {
+      control.markAsTouched();
+      if (control instanceof FormGroup) {
+        this.markFormGroupTouched(control);
+      }
+    });
+  }
+
+  getErrorMessage(path: string): string {
+    const control = this.requestForm.get(path);
+    if (control?.hasError('required')) {
+      return 'Este campo é obrigatório';
+    }
+    if (control?.hasError('minlength')) {
+      return `Mínimo de ${control.errors?.['minlength'].requiredLength} caracteres`;
+    }
+    if (control?.hasError('pattern')) {
+      if (path.includes('nu_cpf')) {
+        return 'CPF inválido';
+      }
+      if (path.includes('co_cep')) {
+        return 'CEP inválido';
+      }
+      return 'Formato inválido';
+    }
+    return '';
   }
 
   closeModal(): void {
     this.showSuccessModal = false;
     this.router.navigate(['/dashboard']);
-  }
-
-  getErrorMessage(controlPath: string): string {
-    const control = this.requestForm.get(controlPath);
-    if (control?.hasError('required')) {
-      return 'Este campo é obrigatório';
-    }
-    if (control?.hasError('pattern')) {
-      if (controlPath.includes('nu_cpf')) {
-        return 'CPF inválido';
-      }
-      if (controlPath.includes('co_cep')) {
-        return 'CEP inválido';
-      }
-    }
-    if (control?.hasError('minlength') || control?.hasError('maxlength')) {
-      return 'UF deve ter 2 caracteres';
-    }
-    if (control?.hasError('cepInvalido')) {
-      return 'CEP não encontrado';
-    }
-    return '';
   }
 } 

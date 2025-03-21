@@ -1,14 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { companyRequests } from '../state/company-request.state';
 import { ModalComponent } from '../../../core/components/modal/modal.component';
 import { BadgeComponent, BadgeVariant } from '../../../core/components/badge/badge.component';
-
+import { DocumentPipe } from '../../../shared/pipes/document.pipe';
+import { CompanyRequestService } from '../services/company-request.service';
+import { CompanyStateService } from '../state/company-state.service';
 @Component({
   selector: 'app-view-request',
   standalone: true,
-  imports: [CommonModule, ModalComponent, BadgeComponent],
+  imports: [CommonModule, ModalComponent, BadgeComponent, DocumentPipe],
   templateUrl: './view.component.html',
   styleUrls: ['./view.component.scss']
 })
@@ -18,13 +19,15 @@ export class ViewRequestComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    public router: Router
+    public router: Router,
+    private companyRequestService: CompanyRequestService,
+    private companyStateService: CompanyStateService
   ) {}
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
-      this.request = companyRequests().find(r => r.id === id);
+      this.request = this.companyStateService.requests.find(r => r.id === id);
       if (!this.request) {
         this.router.navigate(['/dashboard']);
       }
@@ -36,7 +39,9 @@ export class ViewRequestComponent implements OnInit {
   }
 
   confirmDelete(): void {
-    // Implementar exclusão
+    if (this.request) {
+      this.companyRequestService.deleteCompanyRequest(this.request.id);
+    }
     this.router.navigate(['/dashboard']);
   }
 

@@ -4,9 +4,9 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
 import { CepService } from '../../../core/services/cep.service';
-import { MockDataService } from '../../../core/services/mock-data.service';
+import { CompanyRequestService } from '../services/company-request.service';
+import { CompanyStateService } from '../state/company-state.service';
 import { ModalComponent } from '../../../core/components/modal/modal.component';
-import { companyRequests, updateCompanyRequest } from '../state/company-request.state';
 
 @Component({
   selector: 'app-edit-request',
@@ -28,7 +28,8 @@ export class EditRequestComponent implements OnInit {
     private route: ActivatedRoute,
     public router: Router,
     private cepService: CepService,
-    private mockDataService: MockDataService
+    private companyRequestService: CompanyRequestService,
+    private companyStateService: CompanyStateService
   ) {
     this.requestForm = this.fb.group({
       solicitante: this.fb.group({
@@ -53,7 +54,7 @@ export class EditRequestComponent implements OnInit {
 
   ngOnInit(): void {
     this.requestId = this.route.snapshot.paramMap.get('id') || '';
-    const request = companyRequests().find(r => r.id === this.requestId);
+    const request = this.companyStateService.requests.find(r => r.id === this.requestId);
     
     if (!request) {
       this.router.navigate(['/dashboard']);
@@ -120,7 +121,7 @@ export class EditRequestComponent implements OnInit {
 
   onSubmit(): void {
     if (this.requestForm.valid) {
-      const request = companyRequests().find(r => r.id === this.requestId);
+      const request = this.companyStateService.requests.find(r => r.id === this.requestId);
       if (!request) return;
 
       const updatedRequest = {
@@ -129,8 +130,11 @@ export class EditRequestComponent implements OnInit {
         status: request.status // Mantém o status original
       };
 
-      updateCompanyRequest(this.requestId, updatedRequest);
-      this.showSuccessModal = true;
+      this.companyRequestService.updateCompanyRequest(this.requestId, updatedRequest).subscribe({
+        next: () => {
+          this.showSuccessModal = true;
+        }
+      });
     } else {
       this.markFormGroupTouched(this.requestForm);
     }

@@ -2,41 +2,32 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
-import { CompanyRequestService } from '../../core/services/company-request.service';
 import { CompanyRequest } from '../company-request/models/company-request.model';
-import { MockDataService } from '../../core/services/mock-data.service';
 import { BadgeComponent, BadgeVariant } from '../../core/components/badge/badge.component';
 import { ModalComponent } from '../../core/components/modal/modal.component';
-import { companyRequests, totalRequests, activeRequests, pendingRequests, inactiveRequests } from '../company-request/state/company-request.state';
+import { DocumentPipe } from '../../shared/pipes/document.pipe';  
+import { CompanyStateService } from '../company-request/state/company-state.service';
+import { CompanyRequestService } from '../company-request/services/company-request.service';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, ModalComponent, BadgeComponent],
+  imports: [CommonModule, ModalComponent, BadgeComponent, DocumentPipe],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent implements OnInit {
   showDeleteModal = false;
   requestToDelete: string | null = null;
-  
-  // Signals do state
-  protected readonly requests = companyRequests;
-  protected readonly total = totalRequests;
-  protected readonly active = activeRequests;
-  protected readonly pending = pendingRequests;
-  protected readonly inactive = inactiveRequests;
+
   constructor(
     private authService: AuthService,
     private router: Router,
     public companyRequestService: CompanyRequestService,
-    private mockDataService: MockDataService
+    public companyStateService: CompanyStateService
   ) {}
 
-  ngOnInit(): void {
-    // Carrega os dados iniciais
-    this.mockDataService.getCompanyRequests();
-  }
+  ngOnInit(): void {}
 
   getStatusText(status: string): string {
     switch (status) {
@@ -88,9 +79,12 @@ export class DashboardComponent implements OnInit {
 
   confirmDelete(): void {
     if (this.requestToDelete) {
-      this.mockDataService.deleteCompanyRequest(this.requestToDelete);
-      this.showDeleteModal = false;
-      this.requestToDelete = null;
+      this.companyRequestService.deleteCompanyRequest(this.requestToDelete).subscribe({
+        next: () => {
+          this.showDeleteModal = false;
+          this.requestToDelete = null;
+        }
+      });
     }
   }
 
