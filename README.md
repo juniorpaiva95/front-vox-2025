@@ -1,59 +1,108 @@
-# FrontVox
+# Sistema de Solicitações de Empresas
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.0.4.
+Sistema desenvolvido para desafio da vox tecnologia com intuito de gerenciar solicitações de empresas, permitindo criar, visualizar, editar e excluir solicitações.
 
-## Development server
+## Tecnologias Utilizadas
 
-To start a local development server, run:
+- Angular 17
+- TypeScript
+- Tailwind CSS
+- RxJS
 
-```bash
-ng serve
+## Estrutura do Projeto
+
+```
+front-vox/
+├── src/
+│   ├── app/
+│   │   ├── core/                    # Componentes e serviços core da aplicação
+│   │   │   ├── components/          # Componentes reutilizáveis
+│   │   │   │   ├── badge/          # Componente de badge para status
+│   │   │   │   ├── dropdown/       # Componente de menu dropdown
+│   │   │   │   └── modal/          # Componente de modal
+│   │   │   └── services/           # Serviços core
+│   │   │       └── auth.service.ts # Serviço de autenticação
+│   │   │
+│   │   ├── features/               # Módulos de funcionalidades
+│   │   │   ├── company-request/    # Módulo de solicitações
+│   │   │   │   ├── create/        # Componente de criação
+│   │   │   │   ├── edit/          # Componente de edição
+│   │   │   │   ├── view/          # Componente de visualização
+│   │   │   │   ├── dashboard/     # Dashboard principal
+│   │   │   │   ├── services/      # Serviços específicos
+│   │   │   │   └── state/         # Gerenciamento de estado
+│   │   │   └── auth/              # Módulo de autenticação
+│   │   │
+│   │   └── shared/                # Recursos compartilhados
+│   │       └── pipes/             # Pipes personalizados
+│   │           └── document.pipe.ts # Pipe para formatação de CPF/CNPJ
+│   │
+│   └── assets/                    # Recursos estáticos
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## Funcionalidades Principais
 
-## Code scaffolding
+### 1. Dashboard
+- Visualização de todas as solicitações
+- Ações rápidas através de dropdown
+- Indicadores de status com badges coloridos
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+### 2. Gerenciamento de Solicitações
+- **Criação**: Formulário completo com validações para nova solicitação
+- **Edição**: Modificação de solicitações existentes
+- **Visualização**: Detalhes completos da solicitação
+- **Exclusão**: Confirmação via modal
 
-```bash
-ng generate component component-name
-```
+### 3. Componentes Reutilizáveis
+- **Badge**: Exibição de status com cores contextuais
+- **Dropdown**: Menu de ações com suporte a ícones
+- **Modal**: Diálogos de confirmação e feedback
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+### 4. Gerenciamento de Estado
+- Sem uso de libs externas, utilização de serviço simples para gerenciar estado global e de features de forma extensiva
+- Utilização de serviços para gerenciar o estado da aplicação
+- Separação clara entre estado global e estado de feature
+- Reatividade com RxJS
 
-```bash
-ng generate --help
-```
+### 5. Autenticação
+- Autenticação simplista para atender o requisito, gerenciado com localStorage
 
-## Building
+## Como Executar
 
-To build the project run:
+1. Clone o repositório
+2. Instale as dependências:
+   ```bash
+   npm install
+   ```
+3. Execute o projeto:
+   ```bash
+   ng serve
+   ```
+4. Acesse `http://localhost:4200`
 
-```bash
-ng build
-```
+5. Usuário e senha para testes:
+**Usuário** - admin
+**Senha**   - admin
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+## Testes
 
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+O projeto utiliza testes unitários com Jasmine e Karma. Para executar os testes:
 
 ```bash
 ng test
 ```
 
-## Running end-to-end tests
+## Boas Práticas Implementadas
 
-For end-to-end (e2e) testing, run:
+1. **Arquitetura Modular Baseada em Features**: Separação clara de responsabilidades
+2. **Componentes Reutilizáveis**: Redução de duplicação de código
+3. **TypeScript**: Tipagem forte para maior segurança
+4. **Tailwind CSS**: Estilização consistente e responsiva
+5. **Testes Unitários**: Cobertura de testes para componentes críticos
 
-```bash
-ng e2e
-```
+## Melhorias que poderiam ser implementadas
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+1. Implementação de testes e2e
+2. Melhorias na performance
+3. Adição de mais funcionalidades de filtro e busca, paginação.
+4. Implementação de cache

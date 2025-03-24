@@ -71,7 +71,7 @@ describe('DropdownComponent', () => {
     component.isOpen = true;
     fixture.detectChanges();
 
-    const icons = fixture.debugElement.queryAll(By.css('svg'));
+    const icons = fixture.debugElement.queryAll(By.css('button[role="menuitem"] svg path'));
     icons.forEach((icon, index) => {
       expect(icon.attributes['d']).toBe(mockItems[index].icon);
     });
@@ -122,7 +122,6 @@ describe('DropdownComponent', () => {
     component.isOpen = true;
     fixture.detectChanges();
 
-    // Simulate click outside
     document.dispatchEvent(new MouseEvent('click'));
     tick();
 
@@ -138,7 +137,7 @@ describe('DropdownComponent', () => {
     component.isOpen = true;
     fixture.detectChanges();
 
-    const icons = fixture.debugElement.queryAll(By.css('svg'));
+    const icons = fixture.debugElement.queryAll(By.css('button[role="menuitem"] svg'));
     expect(icons.length).toBe(0);
   });
 

@@ -11,6 +11,4 @@ import { HeaderComponent } from './core/components/header/header.component';
     <router-outlet></router-outlet>
   `
 })
-export class AppComponent {
-  title = 'front-vox';
-}
+export class AppComponent {}
