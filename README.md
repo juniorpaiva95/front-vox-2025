@@ -91,6 +91,17 @@ O projeto utiliza testes unitários com Jasmine e Karma. Para executar os testes
 ```bash
 ng test
 ```
+## Telas
+
+### Login
+![image](https://github.com/user-attachments/assets/d08c93f5-30f1-4476-b813-913a8ab75e75)
+
+### Dashboard 
+![image](https://github.com/user-attachments/assets/bcc244d3-ad05-4f37-87b7-9922f5b83fe9)
+
+### Nova solicitação
+![image](https://github.com/user-attachments/assets/e7c59f20-2fe5-478e-a431-fd976e8c2717)
+
 
 ## Boas Práticas Implementadas
 
