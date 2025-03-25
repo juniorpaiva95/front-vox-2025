@@ -2,6 +2,8 @@
 
 Sistema desenvolvido para desafio da vox tecnologia com intuito de gerenciar solicitações de empresas, permitindo criar, visualizar, editar e excluir solicitações.
 
+Disponível em: https://euphonious-kashata-5c2b9f.netlify.app/login
+
 ## Tecnologias Utilizadas
 
 - Angular 17
